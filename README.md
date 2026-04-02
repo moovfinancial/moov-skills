@@ -2,27 +2,13 @@
 
 AI skills for building payment integrations with the [Moov](https://moov.io) platform. Skills give your AI coding assistant offline knowledge of Moov's API patterns, SDKs, and best practices — so it generates correct, production-ready integration code.
 
-Skills are served publicly at [docs.moov.io/skills/](https://docs.moov.io/skills/) and documented at [docs.moov.io/guides/get-started/ai-skill/](https://docs.moov.io/guides/get-started/ai-skill/).
+Full setup guide at [docs.moov.io/guides/get-started/ai-skill/](https://docs.moov.io/guides/get-started/ai-skill/).
 
 ## Quick install
 
 ### Claude Code
 
 Claude Code auto-discovers skill files in `.claude/skills/`. Download all 6 topic-specific skills so Claude loads only what's relevant to each question:
-
-```bash
-mkdir -p .claude/skills/moov-api/accounts .claude/skills/moov-api/payment-sources .claude/skills/moov-api/money-movement .claude/skills/moov-api/commerce .claude/skills/moov-api/issuing
-
-# From docs.moov.io
-curl -sL https://docs.moov.io/skills/moov-api/SKILL.md -o .claude/skills/moov-api/SKILL.md
-curl -sL https://docs.moov.io/skills/moov-api/accounts/SKILL.md -o .claude/skills/moov-api/accounts/SKILL.md
-curl -sL https://docs.moov.io/skills/moov-api/payment-sources/SKILL.md -o .claude/skills/moov-api/payment-sources/SKILL.md
-curl -sL https://docs.moov.io/skills/moov-api/money-movement/SKILL.md -o .claude/skills/moov-api/money-movement/SKILL.md
-curl -sL https://docs.moov.io/skills/moov-api/commerce/SKILL.md -o .claude/skills/moov-api/commerce/SKILL.md
-curl -sL https://docs.moov.io/skills/moov-api/issuing/SKILL.md -o .claude/skills/moov-api/issuing/SKILL.md
-```
-
-Or from GitHub:
 
 ```bash
 mkdir -p .claude/skills/moov-api/accounts .claude/skills/moov-api/payment-sources .claude/skills/moov-api/money-movement .claude/skills/moov-api/commerce .claude/skills/moov-api/issuing
@@ -40,41 +26,41 @@ curl -sL https://raw.githubusercontent.com/moovfinancial/moov-skills/main/moov-a
 ```bash
 mkdir -p .cursor/rules/moov-api
 
-curl -sL https://docs.moov.io/skills/moov-api/SKILL.md -o .cursor/rules/moov-api/core.md
-curl -sL https://docs.moov.io/skills/moov-api/accounts/SKILL.md -o .cursor/rules/moov-api/accounts.md
-curl -sL https://docs.moov.io/skills/moov-api/payment-sources/SKILL.md -o .cursor/rules/moov-api/payment-sources.md
-curl -sL https://docs.moov.io/skills/moov-api/money-movement/SKILL.md -o .cursor/rules/moov-api/money-movement.md
-curl -sL https://docs.moov.io/skills/moov-api/commerce/SKILL.md -o .cursor/rules/moov-api/commerce.md
-curl -sL https://docs.moov.io/skills/moov-api/issuing/SKILL.md -o .cursor/rules/moov-api/issuing.md
+curl -sL https://raw.githubusercontent.com/moovfinancial/moov-skills/main/moov-api/SKILL.md -o .cursor/rules/moov-api/core.md
+curl -sL https://raw.githubusercontent.com/moovfinancial/moov-skills/main/moov-api/accounts/SKILL.md -o .cursor/rules/moov-api/accounts.md
+curl -sL https://raw.githubusercontent.com/moovfinancial/moov-skills/main/moov-api/payment-sources/SKILL.md -o .cursor/rules/moov-api/payment-sources.md
+curl -sL https://raw.githubusercontent.com/moovfinancial/moov-skills/main/moov-api/money-movement/SKILL.md -o .cursor/rules/moov-api/money-movement.md
+curl -sL https://raw.githubusercontent.com/moovfinancial/moov-skills/main/moov-api/commerce/SKILL.md -o .cursor/rules/moov-api/commerce.md
+curl -sL https://raw.githubusercontent.com/moovfinancial/moov-skills/main/moov-api/issuing/SKILL.md -o .cursor/rules/moov-api/issuing.md
 ```
 
 Or download the combined file for older Cursor versions:
 
 ```bash
-curl -sL https://docs.moov.io/skills/moov-api/SKILL-full.md -o .cursorrules
+curl -sL https://raw.githubusercontent.com/moovfinancial/moov-skills/main/moov-api/SKILL-full.md -o .cursorrules
 ```
 
 ### Windsurf
 
 ```bash
-curl -sL https://docs.moov.io/skills/moov-api/SKILL-full.md -o .windsurfrules
+curl -sL https://raw.githubusercontent.com/moovfinancial/moov-skills/main/moov-api/SKILL-full.md -o .windsurfrules
 ```
 
 ### GitHub Copilot / VS Code
 
 ```bash
-curl -sL https://docs.moov.io/skills/moov-api/SKILL-full.md -o .github/copilot-instructions.md
+curl -sL https://raw.githubusercontent.com/moovfinancial/moov-skills/main/moov-api/SKILL-full.md -o .github/copilot-instructions.md
 ```
 
 ### Codex CLI
 
 ```bash
-curl -sL https://docs.moov.io/skills/moov-api/SKILL-full.md -o AGENTS.md
+curl -sL https://raw.githubusercontent.com/moovfinancial/moov-skills/main/moov-api/SKILL-full.md -o AGENTS.md
 ```
 
 ### ChatGPT / Manual
 
-Download [SKILL-full.md](https://docs.moov.io/skills/moov-api/SKILL-full.md) and paste it into your conversation.
+Download [SKILL-full.md](https://raw.githubusercontent.com/moovfinancial/moov-skills/main/moov-api/SKILL-full.md) and paste it into your conversation.
 
 ## Compatibility
 
