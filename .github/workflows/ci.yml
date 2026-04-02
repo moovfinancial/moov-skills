@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate frontmatter
+        run: |
+          errors=0
+          for f in $(find moov-api -name "SKILL.md" ! -name "SKILL-full.md"); do
+            # Check file starts with ---
+            if ! head -1 "$f" | grep -q '^---$'; then
+              echo "ERROR: $f missing frontmatter"
+              errors=$((errors + 1))
+              continue
+            fi
+
+            # Extract frontmatter
+            frontmatter=$(awk 'NR==1 && /^---$/ {f=1; next} f && /^---$/ {exit} f' "$f")
+
+            # Check for name field
+            if ! echo "$frontmatter" | grep -q '^name:'; then
+              echo "ERROR: $f missing 'name' in frontmatter"
+              errors=$((errors + 1))
+            fi
+
+            # Check for description field
+            if ! echo "$frontmatter" | grep -q '^description:'; then
+              echo "ERROR: $f missing 'description' in frontmatter"
+              errors=$((errors + 1))
+            fi
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo "$errors frontmatter error(s) found"
+            exit 1
+          fi
+          echo "All SKILL.md files have valid frontmatter"
+
+      - name: Run combine script
+        run: bash scripts/combine-skills.sh
+
+      - name: Verify output
+        run: |
+          if [ ! -s moov-api/SKILL-full.md ]; then
+            echo "ERROR: SKILL-full.md is empty"
+            exit 1
+          fi
+          echo "SKILL-full.md generated successfully ($(wc -l < moov-api/SKILL-full.md) lines)"
+
+  update-combined:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate SKILL-full.md
+        run: bash scripts/combine-skills.sh
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add moov-api/SKILL-full.md
+          if git diff --cached --quiet; then
+            echo "No changes to SKILL-full.md"
+          else
+            git commit -m "Update SKILL-full.md"
+            git push
+          fi
