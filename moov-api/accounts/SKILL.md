@@ -23,7 +23,7 @@ Two types: **individual** and **business**.
 ```bash
 curl -X POST "https://api.moov.io/accounts" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "accountType": "business",
     "profile": {
@@ -42,7 +42,7 @@ curl -X POST "https://api.moov.io/accounts" \
 ```bash
 curl -X POST "https://api.moov.io/accounts" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "accountType": "individual",
     "profile": {
@@ -62,7 +62,7 @@ curl -X POST "https://api.moov.io/accounts" \
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/capabilities" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "capabilities": [
       "transfers",
@@ -106,7 +106,7 @@ Moov offers two approaches to merchant onboarding:
 ```bash
 curl -X POST "https://api.moov.io/onboarding-invites" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "capabilities": ["transfers", "wallet.balance", "collect-funds.ach", "collect-funds.card-payments"],
     "feePlanCodes": ["your-fee-plan"],
@@ -145,8 +145,15 @@ When a connected account has verification issues after initial onboarding (faile
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/resolution-links" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00" \
+  --data-raw '{
+    "recipient": {
+      "phone": { "number": "5555555555", "countryCode": "1" }
+    }
+  }'
 ```
+
+`recipient` is required: provide either `email` (e.g. `{"recipient": {"email": "user@example.com"}}`) or `phone`, not both. Resolution links require API version `v2026.04.00` or later.
 
 Response includes a hosted URL (`https://moov.link/r/{code}`). The user receives an MFA code via email/phone to verify identity before accessing the form.
 

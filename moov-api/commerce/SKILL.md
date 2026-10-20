@@ -26,7 +26,7 @@ Use payout mode when you need to send money to someone who doesn't have a Moov a
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/payment-links" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "maxUses": 1,
     "payout": {
@@ -67,7 +67,7 @@ Use payment mode when you need to collect money from a customer.
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/payment-links" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "payment": {
       "allowedMethods": ["card-payment", "ach-debit-collect", "apple-pay"],
@@ -119,18 +119,14 @@ Moov has two approaches for billing:
 - **Hosted** (default): Moov's native Invoicing API handles line items, auto-generated payment links, email notifications, and status tracking. The payment link accepts card and ACH — no custom checkout needed. Funds land in the merchant's Moov wallet.
 - **Embedded**: If you already have billing/invoicing in your app, use the Transfers API directly. Create transfers when your system determines payment is due, and use Drops for payment method collection in your UI.
 
-**Important:** Invoices require API version `v2026.04.00` or later.
-
-```
-x-moov-version: v2026.04.00
-```
+**Important:** Invoices require API version `v2026.04.00` or later. The current stable version qualifies, so the examples below use it; an existing integration on an older version must upgrade to use invoices.
 
 ### Create an invoice
 
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/invoices" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.04.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "customerAccountID": "tenant-account-id",
     "invoiceDate": "2026-04-01T00:00:00Z",
@@ -160,7 +156,7 @@ PATCH the status to `unpaid`. This finalizes the invoice, generates a secure pay
 ```bash
 curl -X PATCH "https://api.moov.io/accounts/{accountID}/invoices/{invoiceID}" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.04.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "status": "unpaid"
   }'
@@ -212,7 +208,7 @@ Moov can send branded receipt emails for transfers — with your logo, company n
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/transfers/create-receipts" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "forTransferID": "transfer-id",
     "emailAccountID": "recipient-account-id"
@@ -247,7 +243,7 @@ Look up a bank by routing number to validate it exists and check which payment r
 ```bash
 curl -X GET "https://api.moov.io/institutions?routingNumber=021000021" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 Requires `/fed.read` scope. Returns institution name, address, and supported capabilities.
@@ -257,7 +253,7 @@ Requires `/fed.read` scope. Returns institution name, address, and supported cap
 ```bash
 curl -X GET "https://api.moov.io/enrichment/address?search=123+Main" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 Reduces user input errors by auto-completing addresses.
@@ -267,7 +263,7 @@ Reduces user input errors by auto-completing addresses.
 ```bash
 curl -X GET "https://api.moov.io/enrichment/profile?email=user@example.com" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 Returns publicly available information about an individual or business based on email — use to pre-fill form fields and reduce onboarding friction.

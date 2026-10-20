@@ -12,7 +12,7 @@ description: Card issuing and tap to pay on the Moov platform.
 ```bash
 curl -X POST "https://api.moov.io/issuing/{accountID}/issued-cards" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "authorizedUser": {
       "firstName": "Jane",
@@ -39,7 +39,7 @@ curl -X POST "https://api.moov.io/issuing/{accountID}/issued-cards" \
 ```bash
 curl -X GET "https://api.moov.io/issuing/{accountID}/issued-cards/{cardID}/full-card-number" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 Returns PAN, CVV, expiration. Handle with PCI compliance.

@@ -12,7 +12,7 @@ description: Bank accounts, cards, Apple Pay, Google Pay, wallets, and Moov.js/D
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/bank-accounts" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "account": {
       "accountNumber": "0004321567000",
@@ -43,7 +43,7 @@ curl -X POST "https://api.moov.io/accounts/{accountID}/bank-accounts" \
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/cards" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "cardNumber": "4111111111111111",
     "cardCvv": "123",
@@ -154,7 +154,7 @@ Wallets are auto-created when `wallet.balance` capability is active. To get the 
 # List payment methods, filter for moov-wallet type
 curl -X GET "https://api.moov.io/accounts/{accountID}/payment-methods" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 ## Moov.js / Drops

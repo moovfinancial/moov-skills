@@ -79,7 +79,7 @@ Always check available payment rails before creating a transfer.
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/transfer-options" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "amount": { "value": 5000, "currency": "USD" },
     "source": { "accountID": "source-account-id" },
@@ -94,7 +94,7 @@ curl -X POST "https://api.moov.io/accounts/{accountID}/transfers" \
   -H "Authorization: Bearer {token}" \
   -H "X-Idempotency-Key: {uuid}" \
   -H "X-Wait-For: rail-response" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "amount": { "value": 5000, "currency": "USD" },
     "source": { "paymentMethodID": "source-pm-id" },
@@ -173,7 +173,7 @@ For transfer groups: `created` → `queued` → `pending` → `completed` | `can
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/transfers/{transferID}/reversals" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 No request body needed. If the transfer hasn't settled, it's canceled instantly. If it has settled, a full refund is initiated.
@@ -183,7 +183,7 @@ No request body needed. If the transfer hasn't settled, it's canceled instantly.
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/transfers/{transferID}/reversals" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "amount": { "value": 500, "currency": "USD" }
   }'
@@ -239,7 +239,7 @@ If no response by deadline, Moov accepts the dispute on the merchant's behalf.
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/disputes/{disputeID}/accept" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 This is final — cannot be undone.
@@ -250,14 +250,14 @@ This is final — cannot be undone.
 # 1. Upload evidence file (PDF, JPG, TIFF — max 4 MB each)
 curl -X POST "https://api.moov.io/accounts/{accountID}/disputes/{disputeID}/evidence-file" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   -F "file=@receipt.pdf" \
   -F "evidenceType=receipt"
 
 # 2. Or upload text evidence
 curl -X POST "https://api.moov.io/accounts/{accountID}/disputes/{disputeID}/evidence-text" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "evidenceType": "cover-letter",
     "text": "Customer received goods on March 15..."
@@ -266,7 +266,7 @@ curl -X POST "https://api.moov.io/accounts/{accountID}/disputes/{disputeID}/evid
 # 3. Submit all evidence (can only submit once per dispute)
 curl -X POST "https://api.moov.io/accounts/{accountID}/disputes/{disputeID}/evidence/submit" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 **Evidence types**: `receipt`, `proof-of-delivery`, `cancelation-policy`, `terms-of-service`, `customer-communication`, `cover-letter`, `generic-evidence`
@@ -308,7 +308,7 @@ A child transfer references a parent transfer's ID as its source. Moov waits for
 curl -X POST "https://api.moov.io/accounts/{accountID}/transfers" \
   -H "Authorization: Bearer {token}" \
   -H "X-Idempotency-Key: {uuid}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "amount": { "value": 4500, "currency": "USD" },
     "source": { "transferID": "parent-transfer-id" },
@@ -336,7 +336,7 @@ Use an [RRULE](https://datatracker.ietf.org/doc/html/rfc5545#section-3.3.10) str
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/schedules" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "description": "Monthly subscription",
     "recur": {
@@ -363,7 +363,7 @@ For irregular schedules or varying amounts, provide explicit dates:
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/schedules" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "description": "Loan repayment",
     "occurrences": [

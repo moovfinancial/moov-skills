@@ -20,7 +20,7 @@ You are an expert at building payment integrations with the Moov platform. Use t
 
 If no marker file found, ask the developer which language they are using — don't guess.
 
-2. **Detect API version** — Check if the project already has a Moov SDK installed. Read the version from the package manager lockfile and map it using the version table below. If not found, default to the latest stable version.
+2. **Detect API version** — If the project already calls Moov, keep the API version it uses (see "API Version" below for how to find it). Never upgrade it as a side effect of other work. For a new integration, use the current stable version from https://docs.moov.io/api-versions.json.
 
 3. **Hosted or embedded?** Moov offers hosted flows (payment links, payout links, hosted onboarding, Drops) that handle UI, identity verification, and payment method collection — no custom frontend needed. Some developers already have their own user-facing application and want to embed Moov directly into it using the API and Moov.js components. **Default to hosted unless the developer says they want to build into an existing UI.** If they mention having an existing app, portal, or dashboard where users already interact, recommend the embedded/API-direct approach for those flows.
 
@@ -43,49 +43,36 @@ If no marker file found, ask the developer which language they are using — don
 
 The **source of truth** for all Moov API endpoints, request/response schemas, and parameters is the OpenAPI specification.
 
+- **API versions (machine-readable)**: https://docs.moov.io/api-versions.json — `{"stable": "...", "versions": [...]}`. Fetch this to learn the current stable version; don't rely on the version written in this skill, which can be out of date.
 - **API reference (rendered)**: https://docs.moov.io/api/
-- **OpenAPI spec download**: https://spec.speakeasy.com/moov/moov/api-v2026.01.00
-- **Current stable version**: `v2026.01.00`
+- **OpenAPI spec download**: `https://spec.speakeasy.com/moov/moov/api-<version>` (for example https://spec.speakeasy.com/moov/moov/api-v2026.07.00). Download the dated spec for the version you pin.
 
-When in doubt about request bodies, response shapes, or available fields, consult the OpenAPI spec directly. The rendered API reference at `/api/` includes per-endpoint documentation with request/response examples.
+When in doubt about request bodies, response shapes, or available fields, consult the OpenAPI spec for the version you use. The rendered API reference at `/api/` includes per-endpoint documentation with request/response examples.
 
 ## API Version
 
-Always include the version header. New integrations should use the latest version.
+Moov releases a new API version each quarter (`vYYYY.MM.00`). Every request runs against one pinned version, sent in the `X-Moov-Version` header. If the header is omitted, the API defaults to `v2024.01.00`.
+
+**Rules:**
+- **New integrations**: use the `stable` version from https://docs.moov.io/api-versions.json and pin it. Any version newer than `stable` is still in development; don't use it for production code.
+- **Existing integrations**: keep the version the code already uses. Upgrading is a deliberate change. Read the changelog (https://docs.moov.io/changelog/) for breaking changes first.
+- **Never follow "latest" at runtime.** Code should always send one fixed version, so a new Moov release can't change behavior underneath it.
+
+The examples in these skills send `x-moov-version: v2026.07.00`, the stable version when they were last updated. Check the manifest and substitute the current stable version for new work.
 
 ```
-x-moov-version: v2026.01.00
+x-moov-version: v2026.07.00
 ```
 
-If omitted, the API defaults to `v2024.01.00`.
+### How each SDK picks the version
 
-### Version mapping
+| SDK | How the version is set | How to find the version an existing project uses |
+|-----|------------------------|------------------------------------------------|
+| TypeScript `@moovio/sdk`, Python `moovio_sdk`, Java, .NET, PHP, Ruby | Each release line targets one API version and sends it automatically; there is no per-client setting. Choose the version by installing that release line (npm: `npm install @moovio/sdk@2026-07`). | The installed package records it as `openapiDocVersion` (TypeScript: `node_modules/@moovio/sdk/lib/config.js`; Python: `moovio_sdk.OPENAPI_DOC_VERSION`). |
+| Go `github.com/moovfinancial/moov-go` | Import the versioned package for the API version you want, e.g. `github.com/moovfinancial/moov-go/pkg/mv2607` sends `v2026.07.00`. Most methods in the base `pkg/moov` package send no version header, so the server uses its default. | Look for `moov-go/pkg/mvYYMM` imports and `moov.MoovVersion(...)` calls. The `moov-go` version in `go.mod` is the library release, not the API version. |
+| Direct HTTP | Send the `X-Moov-Version` header on every request. | Search the code for `X-Moov-Version`. |
 
-| API version | SDK version | Quarter |
-|-------------|-------------|---------|
-| `v2026.04.00` | `26.4.x` | Q2 2026 (in development) |
-| `v2026.01.00` | `26.1.x` | Q1 2026 (latest stable) |
-| `v2025.10.00` | `25.10.x` | Q4 2025 |
-| `v2025.07.00` | `25.7.x` | Q3 2025 |
-| `v2025.04.00` | `25.4.x` | Q2 2025 |
-
-Pattern: API `vYYYY.MM.00` → SDK `YY.M.x`
-
-SDKs automatically set the `X-Moov-Version` header based on the version installed. Never hardcode the API version in URLs — use the SDK client which handles versioning.
-
-**Per-SDK:**
-```go
-// Go — set on client
-mc, _ := moov.NewClient(moov.WithAPIVersion("v2026.01.00"))
-```
-```typescript
-// TypeScript
-const moov = new Moov({ apiVersion: "v2026.01.00", ...opts });
-```
-```python
-# Python
-client = Moov(api_version="v2026.01.00")
-```
+Don't infer the API version from an SDK's own version number. It doesn't follow the API quarter consistently across languages.
 
 ## Authentication
 
@@ -139,7 +126,7 @@ Response:
 ```bash
 curl -X POST "https://api.moov.io/accounts" \
   -H "Authorization: Bearer {access_token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{ "accountType": "business", ... }'
 ```
 
@@ -204,7 +191,7 @@ For purely server-side integrations where you don't need client tokens, you can 
 ```bash
 curl -X GET "https://api.moov.io/accounts/{accountID}" \
   -H "Authorization: Basic {base64(public_key:private_key)}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 ### Token revocation
@@ -242,7 +229,7 @@ curl -X POST "https://api.moov.io/oauth2/revoke" \
 
 ### API version mismatch
 
-If you see unexpected response shapes, missing fields, or deprecated field errors: check that `X-Moov-Version` is set (defaults to oldest version if omitted) and that SDK version matches the API version per the version mapping table above.
+If you see unexpected response shapes, missing fields, or deprecated field errors: check that `X-Moov-Version` is set (defaults to `v2024.01.00` if omitted) and that the code, the installed SDK, and the docs or spec you're reading all use the same API version. See "How each SDK picks the version" above.
 
 ### Card-specific failure codes
 
@@ -295,7 +282,7 @@ Webhooks send real-time HTTP POST notifications to your server when events occur
 ```bash
 curl -X POST "https://api.moov.io/webhooks" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "url": "https://your-app.com/webhooks/moov",
     "eventTypes": [
