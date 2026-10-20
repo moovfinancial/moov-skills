@@ -50,7 +50,7 @@ When in doubt about request bodies, response shapes, or available fields, consul
 Moov releases a new API version each quarter (`vYYYY.MM.00`). Every request runs against one pinned version, sent in the `X-Moov-Version` header. If the header is omitted, the API defaults to `v2024.01.00`.
 
 **Rules:**
-- **New integrations**: use the `stable` version from https://docs.moov.io/api-versions.json and pin it. Don't use a version marked "in development" for production code.
+- **New integrations**: use the `stable` version from https://docs.moov.io/api-versions.json and pin it. Any version newer than `stable` is still in development; don't use it for production code.
 - **Existing integrations**: keep the version the code already uses. Upgrading is a deliberate change. Read the changelog (https://docs.moov.io/changelog/) for breaking changes first.
 - **Never follow "latest" at runtime.** Code should always send one fixed version, so a new Moov release can't change behavior underneath it.
 
