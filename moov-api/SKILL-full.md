@@ -65,7 +65,7 @@ x-moov-version: v2026.07.00
 | SDK | How the version is set | How to find the version an existing project uses |
 |-----|------------------------|------------------------------------------------|
 | TypeScript `@moovio/sdk`, Python `moovio_sdk`, Java, .NET, PHP, Ruby | Each release line targets one API version and sends it automatically; there is no per-client setting. Choose the version by installing that release line (npm: `npm install @moovio/sdk@2026-07`). | The installed package records it as `openapiDocVersion` (TypeScript: `node_modules/@moovio/sdk/lib/config.js`; Python: `moovio_sdk.OPENAPI_DOC_VERSION`). |
-| Go `github.com/moovfinancial/moov-go` | The SDK sets the version for each endpoint itself. | Check the `moov-go` version in `go.mod`. |
+| Go `github.com/moovfinancial/moov-go` | Import the versioned package for the API version you want, e.g. `github.com/moovfinancial/moov-go/pkg/mv2607` sends `v2026.07.00`. Most methods in the base `pkg/moov` package send no version header, so the server uses its default. | Look for `moov-go/pkg/mvYYMM` imports and `moov.MoovVersion(...)` calls. The `moov-go` version in `go.mod` is the library release, not the API version. |
 | Direct HTTP | Send the `X-Moov-Version` header on every request. | Search the code for `X-Moov-Version`. |
 
 Don't infer the API version from an SDK's own version number. It doesn't follow the API quarter consistently across languages.
