@@ -501,8 +501,15 @@ When a connected account has verification issues after initial onboarding (faile
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/resolution-links" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.07.00"
+  -H "x-moov-version: v2026.07.00" \
+  --data-raw '{
+    "recipient": {
+      "phone": { "number": "5555555555", "countryCode": "1" }
+    }
+  }'
 ```
+
+`recipient` is required: provide either `email` (e.g. `{"recipient": {"email": "user@example.com"}}`) or `phone`, not both. Resolution links require API version `v2026.04.00` or later.
 
 Response includes a hosted URL (`https://moov.link/r/{code}`). The user receives an MFA code via email/phone to verify identity before accessing the form.
 
