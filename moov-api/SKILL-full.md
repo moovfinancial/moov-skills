@@ -16,7 +16,7 @@ You are an expert at building payment integrations with the Moov platform. Use t
 
 If no marker file found, ask the developer which language they are using — don't guess.
 
-2. **Detect API version** — Check if the project already has a Moov SDK installed. Read the version from the package manager lockfile and map it using the version table below. If not found, default to the latest stable version.
+2. **Detect API version** — If the project already calls Moov, keep the API version it uses (see "API Version" below for how to find it). Never upgrade it as a side effect of other work. For a new integration, use the current stable version from https://docs.moov.io/api-versions.json.
 
 3. **Hosted or embedded?** Moov offers hosted flows (payment links, payout links, hosted onboarding, Drops) that handle UI, identity verification, and payment method collection — no custom frontend needed. Some developers already have their own user-facing application and want to embed Moov directly into it using the API and Moov.js components. **Default to hosted unless the developer says they want to build into an existing UI.** If they mention having an existing app, portal, or dashboard where users already interact, recommend the embedded/API-direct approach for those flows.
 
@@ -39,49 +39,36 @@ If no marker file found, ask the developer which language they are using — don
 
 The **source of truth** for all Moov API endpoints, request/response schemas, and parameters is the OpenAPI specification.
 
+- **API versions (machine-readable)**: https://docs.moov.io/api-versions.json — `{"stable": "...", "versions": [...]}`. Fetch this to learn the current stable version; don't rely on the version written in this skill, which can be out of date.
 - **API reference (rendered)**: https://docs.moov.io/api/
-- **OpenAPI spec download**: https://spec.speakeasy.com/moov/moov/api-v2026.01.00
-- **Current stable version**: `v2026.01.00`
+- **OpenAPI spec download**: `https://spec.speakeasy.com/moov/moov/api-<version>` (for example https://spec.speakeasy.com/moov/moov/api-v2026.07.00). Download the dated spec for the version you pin.
 
-When in doubt about request bodies, response shapes, or available fields, consult the OpenAPI spec directly. The rendered API reference at `/api/` includes per-endpoint documentation with request/response examples.
+When in doubt about request bodies, response shapes, or available fields, consult the OpenAPI spec for the version you use. The rendered API reference at `/api/` includes per-endpoint documentation with request/response examples.
 
 ## API Version
 
-Always include the version header. New integrations should use the latest version.
+Moov releases a new API version each quarter (`vYYYY.MM.00`). Every request runs against one pinned version, sent in the `X-Moov-Version` header. If the header is omitted, the API defaults to `v2024.01.00`.
+
+**Rules:**
+- **New integrations**: use the `stable` version from https://docs.moov.io/api-versions.json and pin it. Don't use a version marked "in development" for production code.
+- **Existing integrations**: keep the version the code already uses. Upgrading is a deliberate change. Read the changelog (https://docs.moov.io/changelog/) for breaking changes first.
+- **Never follow "latest" at runtime.** Code should always send one fixed version, so a new Moov release can't change behavior underneath it.
+
+The examples in these skills send `x-moov-version: v2026.07.00`, the stable version when they were last updated. Check the manifest and substitute the current stable version for new work.
 
 ```
-x-moov-version: v2026.01.00
+x-moov-version: v2026.07.00
 ```
 
-If omitted, the API defaults to `v2024.01.00`.
+### How each SDK picks the version
 
-### Version mapping
+| SDK | How the version is set | How to find the version an existing project uses |
+|-----|------------------------|------------------------------------------------|
+| TypeScript `@moovio/sdk`, Python `moovio_sdk`, Java, .NET, PHP, Ruby | Each release line targets one API version and sends it automatically; there is no per-client setting. Choose the version by installing that release line (npm: `npm install @moovio/sdk@2026-07`). | The installed package records it as `openapiDocVersion` (TypeScript: `node_modules/@moovio/sdk/lib/config.js`; Python: `moovio_sdk.OPENAPI_DOC_VERSION`). |
+| Go `github.com/moovfinancial/moov-go` | The SDK sets the version for each endpoint itself. | Check the `moov-go` version in `go.mod`. |
+| Direct HTTP | Send the `X-Moov-Version` header on every request. | Search the code for `X-Moov-Version`. |
 
-| API version | SDK version | Quarter |
-|-------------|-------------|---------|
-| `v2026.04.00` | `26.4.x` | Q2 2026 (in development) |
-| `v2026.01.00` | `26.1.x` | Q1 2026 (latest stable) |
-| `v2025.10.00` | `25.10.x` | Q4 2025 |
-| `v2025.07.00` | `25.7.x` | Q3 2025 |
-| `v2025.04.00` | `25.4.x` | Q2 2025 |
-
-Pattern: API `vYYYY.MM.00` → SDK `YY.M.x`
-
-SDKs automatically set the `X-Moov-Version` header based on the version installed. Never hardcode the API version in URLs — use the SDK client which handles versioning.
-
-**Per-SDK:**
-```go
-// Go — set on client
-mc, _ := moov.NewClient(moov.WithAPIVersion("v2026.01.00"))
-```
-```typescript
-// TypeScript
-const moov = new Moov({ apiVersion: "v2026.01.00", ...opts });
-```
-```python
-# Python
-client = Moov(api_version="v2026.01.00")
-```
+Don't infer the API version from an SDK's own version number. It doesn't follow the API quarter consistently across languages.
 
 ## Authentication
 
@@ -135,7 +122,7 @@ Response:
 ```bash
 curl -X POST "https://api.moov.io/accounts" \
   -H "Authorization: Bearer {access_token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{ "accountType": "business", ... }'
 ```
 
@@ -200,7 +187,7 @@ For purely server-side integrations where you don't need client tokens, you can 
 ```bash
 curl -X GET "https://api.moov.io/accounts/{accountID}" \
   -H "Authorization: Basic {base64(public_key:private_key)}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 ### Token revocation
@@ -238,7 +225,7 @@ curl -X POST "https://api.moov.io/oauth2/revoke" \
 
 ### API version mismatch
 
-If you see unexpected response shapes, missing fields, or deprecated field errors: check that `X-Moov-Version` is set (defaults to oldest version if omitted) and that SDK version matches the API version per the version mapping table above.
+If you see unexpected response shapes, missing fields, or deprecated field errors: check that `X-Moov-Version` is set (defaults to `v2024.01.00` if omitted) and that the code, the installed SDK, and the docs or spec you're reading all use the same API version. See "How each SDK picks the version" above.
 
 ### Card-specific failure codes
 
@@ -291,7 +278,7 @@ Webhooks send real-time HTTP POST notifications to your server when events occur
 ```bash
 curl -X POST "https://api.moov.io/webhooks" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "url": "https://your-app.com/webhooks/moov",
     "eventTypes": [
@@ -392,7 +379,7 @@ Two types: **individual** and **business**.
 ```bash
 curl -X POST "https://api.moov.io/accounts" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "accountType": "business",
     "profile": {
@@ -411,7 +398,7 @@ curl -X POST "https://api.moov.io/accounts" \
 ```bash
 curl -X POST "https://api.moov.io/accounts" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "accountType": "individual",
     "profile": {
@@ -431,7 +418,7 @@ curl -X POST "https://api.moov.io/accounts" \
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/capabilities" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "capabilities": [
       "transfers",
@@ -475,7 +462,7 @@ Moov offers two approaches to merchant onboarding:
 ```bash
 curl -X POST "https://api.moov.io/onboarding-invites" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "capabilities": ["transfers", "wallet.balance", "collect-funds.ach", "collect-funds.card-payments"],
     "feePlanCodes": ["your-fee-plan"],
@@ -514,7 +501,7 @@ When a connected account has verification issues after initial onboarding (faile
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/resolution-links" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 Response includes a hosted URL (`https://moov.link/r/{code}`). The user receives an MFA code via email/phone to verify identity before accessing the form.
@@ -536,7 +523,7 @@ Response includes a hosted URL (`https://moov.link/r/{code}`). The user receives
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/bank-accounts" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "account": {
       "accountNumber": "0004321567000",
@@ -567,7 +554,7 @@ curl -X POST "https://api.moov.io/accounts/{accountID}/bank-accounts" \
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/cards" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "cardNumber": "4111111111111111",
     "cardCvv": "123",
@@ -678,7 +665,7 @@ Wallets are auto-created when `wallet.balance` capability is active. To get the 
 # List payment methods, filter for moov-wallet type
 curl -X GET "https://api.moov.io/accounts/{accountID}/payment-methods" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 ## Moov.js / Drops
@@ -921,7 +908,7 @@ Always check available payment rails before creating a transfer.
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/transfer-options" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "amount": { "value": 5000, "currency": "USD" },
     "source": { "accountID": "source-account-id" },
@@ -936,7 +923,7 @@ curl -X POST "https://api.moov.io/accounts/{accountID}/transfers" \
   -H "Authorization: Bearer {token}" \
   -H "X-Idempotency-Key: {uuid}" \
   -H "X-Wait-For: rail-response" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "amount": { "value": 5000, "currency": "USD" },
     "source": { "paymentMethodID": "source-pm-id" },
@@ -1015,7 +1002,7 @@ For transfer groups: `created` → `queued` → `pending` → `completed` | `can
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/transfers/{transferID}/reversals" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 No request body needed. If the transfer hasn't settled, it's canceled instantly. If it has settled, a full refund is initiated.
@@ -1025,7 +1012,7 @@ No request body needed. If the transfer hasn't settled, it's canceled instantly.
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/transfers/{transferID}/reversals" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "amount": { "value": 500, "currency": "USD" }
   }'
@@ -1081,7 +1068,7 @@ If no response by deadline, Moov accepts the dispute on the merchant's behalf.
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/disputes/{disputeID}/accept" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 This is final — cannot be undone.
@@ -1092,14 +1079,14 @@ This is final — cannot be undone.
 # 1. Upload evidence file (PDF, JPG, TIFF — max 4 MB each)
 curl -X POST "https://api.moov.io/accounts/{accountID}/disputes/{disputeID}/evidence-file" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   -F "file=@receipt.pdf" \
   -F "evidenceType=receipt"
 
 # 2. Or upload text evidence
 curl -X POST "https://api.moov.io/accounts/{accountID}/disputes/{disputeID}/evidence-text" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "evidenceType": "cover-letter",
     "text": "Customer received goods on March 15..."
@@ -1108,7 +1095,7 @@ curl -X POST "https://api.moov.io/accounts/{accountID}/disputes/{disputeID}/evid
 # 3. Submit all evidence (can only submit once per dispute)
 curl -X POST "https://api.moov.io/accounts/{accountID}/disputes/{disputeID}/evidence/submit" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 **Evidence types**: `receipt`, `proof-of-delivery`, `cancelation-policy`, `terms-of-service`, `customer-communication`, `cover-letter`, `generic-evidence`
@@ -1150,7 +1137,7 @@ A child transfer references a parent transfer's ID as its source. Moov waits for
 curl -X POST "https://api.moov.io/accounts/{accountID}/transfers" \
   -H "Authorization: Bearer {token}" \
   -H "X-Idempotency-Key: {uuid}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "amount": { "value": 4500, "currency": "USD" },
     "source": { "transferID": "parent-transfer-id" },
@@ -1178,7 +1165,7 @@ Use an [RRULE](https://datatracker.ietf.org/doc/html/rfc5545#section-3.3.10) str
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/schedules" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "description": "Monthly subscription",
     "recur": {
@@ -1205,7 +1192,7 @@ For irregular schedules or varying amounts, provide explicit dates:
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/schedules" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "description": "Loan repayment",
     "occurrences": [
@@ -1308,7 +1295,7 @@ Use payout mode when you need to send money to someone who doesn't have a Moov a
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/payment-links" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "maxUses": 1,
     "payout": {
@@ -1349,7 +1336,7 @@ Use payment mode when you need to collect money from a customer.
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/payment-links" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "payment": {
       "allowedMethods": ["card-payment", "ach-debit-collect", "apple-pay"],
@@ -1401,18 +1388,14 @@ Moov has two approaches for billing:
 - **Hosted** (default): Moov's native Invoicing API handles line items, auto-generated payment links, email notifications, and status tracking. The payment link accepts card and ACH — no custom checkout needed. Funds land in the merchant's Moov wallet.
 - **Embedded**: If you already have billing/invoicing in your app, use the Transfers API directly. Create transfers when your system determines payment is due, and use Drops for payment method collection in your UI.
 
-**Important:** Invoices require API version `v2026.04.00` or later.
-
-```
-x-moov-version: v2026.04.00
-```
+**Important:** Invoices require API version `v2026.04.00` or later. The current stable version qualifies, so the examples below use it; an existing integration on an older version must upgrade to use invoices.
 
 ### Create an invoice
 
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/invoices" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.04.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "customerAccountID": "tenant-account-id",
     "invoiceDate": "2026-04-01T00:00:00Z",
@@ -1442,7 +1425,7 @@ PATCH the status to `unpaid`. This finalizes the invoice, generates a secure pay
 ```bash
 curl -X PATCH "https://api.moov.io/accounts/{accountID}/invoices/{invoiceID}" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.04.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "status": "unpaid"
   }'
@@ -1494,7 +1477,7 @@ Moov can send branded receipt emails for transfers — with your logo, company n
 ```bash
 curl -X POST "https://api.moov.io/accounts/{accountID}/transfers/create-receipts" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "forTransferID": "transfer-id",
     "emailAccountID": "recipient-account-id"
@@ -1529,7 +1512,7 @@ Look up a bank by routing number to validate it exists and check which payment r
 ```bash
 curl -X GET "https://api.moov.io/institutions?routingNumber=021000021" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 Requires `/fed.read` scope. Returns institution name, address, and supported capabilities.
@@ -1539,7 +1522,7 @@ Requires `/fed.read` scope. Returns institution name, address, and supported cap
 ```bash
 curl -X GET "https://api.moov.io/enrichment/address?search=123+Main" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 Reduces user input errors by auto-completing addresses.
@@ -1549,7 +1532,7 @@ Reduces user input errors by auto-completing addresses.
 ```bash
 curl -X GET "https://api.moov.io/enrichment/profile?email=user@example.com" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 Returns publicly available information about an individual or business based on email — use to pre-fill form fields and reduce onboarding friction.
@@ -1564,7 +1547,7 @@ Returns publicly available information about an individual or business based on 
 ```bash
 curl -X POST "https://api.moov.io/issuing/{accountID}/issued-cards" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00" \
+  -H "x-moov-version: v2026.07.00" \
   --data-raw '{
     "authorizedUser": {
       "firstName": "Jane",
@@ -1591,7 +1574,7 @@ curl -X POST "https://api.moov.io/issuing/{accountID}/issued-cards" \
 ```bash
 curl -X GET "https://api.moov.io/issuing/{accountID}/issued-cards/{cardID}/full-card-number" \
   -H "Authorization: Bearer {token}" \
-  -H "x-moov-version: v2026.01.00"
+  -H "x-moov-version: v2026.07.00"
 ```
 
 Returns PAN, CVV, expiration. Handle with PCI compliance.

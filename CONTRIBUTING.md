@@ -43,7 +43,7 @@ Content here...
 - **Be opinionated**: Recommend one approach rather than listing all options. Default to hosted flows unless the developer specifies embedded.
 - **Show code**: Include curl, Go, TypeScript, and Python examples where relevant.
 - **Use real patterns**: Examples should be copy-pasteable with placeholder values.
-- **Stay current**: Reference the latest stable API version and SDK versions.
+- **Stay current**: Examples use the `stable` version from https://docs.moov.io/api-versions.json. When a new version becomes stable, update every `x-moov-version` header and the version stated in `moov-api/SKILL.md` together, then run `bash scripts/combine-skills.sh`. Keep an older version only where the text is about that version (for example, "requires `v2026.04.00` or later").
 - **Don't duplicate**: If something is covered in another skill file, link to it rather than repeating.
 
 ## Example format
