@@ -14,9 +14,12 @@ You are an expert at building payment integrations with the Moov platform. Use t
 | Marker file | Language | SDK package | Import |
 |-------------|----------|-------------|--------|
 | `package.json` or `tsconfig.json` | TypeScript | `@moovio/sdk` | `import { Moov } from "@moovio/sdk"` |
-| `go.mod` | Go | `github.com/moovfinancial/moov-go` | `import moov "github.com/moovfinancial/moov-go"` |
-| `pyproject.toml` or `requirements.txt` | Python | `moov` | `from moov import Moov` |
-| `*.csproj` or `*.sln` | .NET | `Moov` | `using Moov` |
+| `go.mod` | Go | `github.com/moovfinancial/moov-go` | `import "github.com/moovfinancial/moov-go/pkg/moov"` (pin the API version with `pkg/mvYYMM`; see "API Version") |
+| `pyproject.toml` or `requirements.txt` | Python | `moovio_sdk` | `from moovio_sdk import Moov` |
+| `*.csproj` or `*.sln` | .NET | `Moov.Sdk` | `using Moov.Sdk;` |
+| `pom.xml` or `build.gradle` | Java | `io.moov:sdk` | `import io.moov.sdk.Moov;` |
+| `composer.json` | PHP | `moov/moov-php` | `use Moov\MoovPhp;` |
+| `Gemfile` | Ruby | `moov_ruby` | `require 'moov_ruby'` |
 
 If no marker file found, ask the developer which language they are using — don't guess.
 
@@ -250,8 +253,11 @@ If you see unexpected response shapes, missing fields, or deprecated field error
 |----------|---------|---------|
 | Go | `github.com/moovfinancial/moov-go` | `go get github.com/moovfinancial/moov-go` |
 | TypeScript | `@moovio/sdk` | `npm install @moovio/sdk` |
-| Python | `moov` | `pip install moov` |
-| .NET | `Moov` | `dotnet add package Moov` |
+| Python | `moovio_sdk` | `pip install moovio_sdk` |
+| .NET | `Moov.Sdk` | `dotnet add package Moov.Sdk` |
+| Java | `io.moov:sdk` | Gradle `implementation 'io.moov:sdk:<version>'`, or the Maven `io.moov` / `sdk` dependency |
+| PHP | `moov/moov-php` | `composer require moov/moov-php` |
+| Ruby | `moov_ruby` | `gem install moov_ruby` |
 | Moov.js (browser) | `@moovio/moov-js` | `npm install @moovio/moov-js` |
 
 ## Webhooks
