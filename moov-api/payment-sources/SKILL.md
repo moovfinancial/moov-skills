@@ -19,7 +19,7 @@ curl -X POST "https://api.moov.io/accounts/{accountID}/bank-accounts" \
       "bankAccountType": "checking",
       "holderName": "Jane Doe",
       "holderType": "individual",
-      "routingNumber": "123456789"
+      "routingNumber": "322271627"
     }
   }'
 ```
