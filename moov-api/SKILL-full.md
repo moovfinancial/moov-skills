@@ -364,7 +364,7 @@ This gives your AI access to `search_moov_docs`, `get_moov_doc`, and `list_moov_
 - Test cards are specific numbers (e.g. Visa debit `4111111111111111`), not generic test patterns — use the ones on the test mode page
 - ACH in test mode follows the real ACH schedule, only faster: wait for transfer status webhooks; don't expect ACH to complete right away or try to speed it up
 - Simulate failures with trigger amounts instead of waiting for real ones: ACH returns use `55xx` cents (`5501` = R01 insufficient funds, `5502` = R02 account closed, …); RTP rejections use `72xx` cents (`7203` = AC03 invalid account)
-- ACH notifications of change, micro-deposit failures, card declines, and disputes also have triggers on the test mode page
+- ACH notifications of change, card declines, and disputes also have triggers on the test mode page
 - Tap to Pay test mode uses simulated card selection — no physical tap needed
 - Always test in sandbox before going to production
 
