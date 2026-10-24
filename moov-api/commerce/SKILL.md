@@ -1,5 +1,5 @@
 ---
-name: Moov Commerce
+name: moov-commerce
 description: Payment links, invoices, receipts, and enrichment on the Moov platform.
 ---
 

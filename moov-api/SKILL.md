@@ -1,5 +1,5 @@
 ---
-name: Moov API Core
+name: moov-api
 description: Mental model, authentication, API versioning, hosted vs embedded approach, common errors, card failure codes, SDKs, webhooks, MCP server, and test mode for the Moov platform.
 ---
 

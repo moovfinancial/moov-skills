@@ -1,5 +1,5 @@
 ---
-name: Moov Money Movement
+name: moov-money-movement
 description: Transfers, refunds, reversals, disputes, transfer groups, scheduled transfers, and wallet sweeps on the Moov platform.
 ---
 

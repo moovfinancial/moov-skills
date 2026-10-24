@@ -1,5 +1,5 @@
 ---
-name: Moov Accounts
+name: moov-accounts
 description: Account creation, capabilities, hosted onboarding, and resolution links on the Moov platform.
 ---
 
