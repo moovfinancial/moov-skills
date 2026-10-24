@@ -1,5 +1,5 @@
 ---
-name: Moov Issuing
+name: moov-issuing
 description: Card issuing and tap to pay on the Moov platform.
 ---
 

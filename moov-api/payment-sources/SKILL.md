@@ -1,5 +1,5 @@
 ---
-name: Moov Payment Sources
+name: moov-payment-sources
 description: Bank accounts, cards, Apple Pay, Google Pay, wallets, and Moov.js/Drops UI components on the Moov platform.
 ---
 
