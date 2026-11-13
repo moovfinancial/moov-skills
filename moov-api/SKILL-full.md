@@ -359,7 +359,7 @@ This gives your AI access to `search_moov_docs`, `get_moov_doc`, and `list_moov_
 
 - Test mode is a separate environment with sample data pre-loaded
 - Use test-mode API keys (created in Dashboard with test mode toggled on)
-- Full list of test cards, amounts, and routing numbers: https://docs.moov.io/guides/get-started/test-mode/ — fetch it before writing tests
+- Full list of test cards, amounts, and routing numbers: https://docs.moov.io/guides/get-started/api-authentication/test-mode/ — fetch it before writing tests
 - Test bank accounts need a valid routing number (example: `322271627`); the account number can be any number
 - Test cards are specific numbers (e.g. Visa debit `4111111111111111`), not generic test patterns — use the ones on the test mode page
 - ACH in test mode follows the real ACH schedule, only faster: wait for transfer status webhooks; don't expect ACH to complete right away or try to speed it up
@@ -1617,7 +1617,7 @@ PATCH `controls` replaces each control you send in full; send `null` to remove o
 
 ### Test mode simulations
 
-Simulation endpoints need `X-Moov-Version: v2026.10.00` (they don't exist in v2026.07.00) and test-mode keys. Docs: https://docs.moov.io/guides/get-started/test-mode/#spending-card-simulations
+Simulation endpoints need `X-Moov-Version: v2026.10.00` (they don't exist in v2026.07.00) and test-mode keys. Docs: https://docs.moov.io/guides/get-started/api-authentication/test-mode/#spending-card-simulations
 
 | Simulate | Endpoint | Body |
 |----------|----------|------|

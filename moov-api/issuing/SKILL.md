@@ -65,7 +65,7 @@ PATCH `controls` replaces each control you send in full; send `null` to remove o
 
 ### Test mode simulations
 
-Simulation endpoints need `X-Moov-Version: v2026.10.00` (they don't exist in v2026.07.00) and test-mode keys. Docs: https://docs.moov.io/guides/get-started/test-mode/#spending-card-simulations
+Simulation endpoints need `X-Moov-Version: v2026.10.00` (they don't exist in v2026.07.00) and test-mode keys. Docs: https://docs.moov.io/guides/get-started/api-authentication/test-mode/#spending-card-simulations
 
 | Simulate | Endpoint | Body |
 |----------|----------|------|
