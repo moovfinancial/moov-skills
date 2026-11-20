@@ -277,7 +277,7 @@ Webhooks send real-time HTTP POST notifications to your server when events occur
 | Bank accounts | `bankAccount.created`, `bankAccount.updated` |
 | Cards | `card.created`, `card.updated`, `card.autoUpdated` |
 | Payment methods | `paymentMethod.created`, `paymentMethod.updated`, `paymentMethod.disabled` |
-| Wallets | `wallet.transaction.created`, `wallet.transaction.updated` |
+| Wallets | `wallet.created`, `wallet.updated`, `walletTransaction.updated` |
 | Invoices | `invoice.created`, `invoice.updated` |
 | Payment links | `payment-link.completed` |
 | Sweeps | `sweep.updated` |

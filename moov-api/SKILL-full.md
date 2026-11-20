@@ -273,7 +273,7 @@ Webhooks send real-time HTTP POST notifications to your server when events occur
 | Bank accounts | `bankAccount.created`, `bankAccount.updated` |
 | Cards | `card.created`, `card.updated`, `card.autoUpdated` |
 | Payment methods | `paymentMethod.created`, `paymentMethod.updated`, `paymentMethod.disabled` |
-| Wallets | `wallet.transaction.created`, `wallet.transaction.updated` |
+| Wallets | `wallet.created`, `wallet.updated`, `walletTransaction.updated` |
 | Invoices | `invoice.created`, `invoice.updated` |
 | Payment links | `payment-link.completed` |
 | Sweeps | `sweep.updated` |
@@ -1250,6 +1250,8 @@ You can combine `recur` and `occurrences` in one schedule (e.g. a one-time setup
 - List schedules: `GET /accounts/{accountID}/schedules`
 
 Only the account that created the schedule can modify it. Transfers already created from a schedule won't be canceled by updating the schedule.
+
+Moov does not send `schedule.*` webhook events. When an occurrence runs, subscribe to `transfer.created` and `transfer.updated`.
 
 ## Sweeps
 

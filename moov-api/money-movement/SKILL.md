@@ -405,6 +405,8 @@ You can combine `recur` and `occurrences` in one schedule (e.g. a one-time setup
 
 Only the account that created the schedule can modify it. Transfers already created from a schedule won't be canceled by updating the schedule.
 
+Moov does not send `schedule.*` webhook events. When an occurrence runs, subscribe to `transfer.created` and `transfer.updated`.
+
 ## Sweeps
 
 **Do not build your own wallet-to-bank payout cron job.** Moov sweeps automatically transfer wallet funds to a bank account on a daily schedule. This applies to both hosted and embedded integrations — sweeps are a server-side feature, not a UI choice.
