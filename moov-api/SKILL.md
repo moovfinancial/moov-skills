@@ -310,7 +310,7 @@ curl -X POST "https://api.moov.io/webhooks" \
 
 ### Verify webhook signature
 
-Moov sends these headers: `X-Timestamp`, `X-Nonce`, `X-Webhook-ID`, `X-Signature`.
+Moov sends these headers: `X-Timestamp`, `X-Nonce`, `X-Webhook-ID`, `X-Signature`. `X-Webhook-ID` is the webhook subscription ID and is the same on every delivery for that webhook.
 
 ```go
 import (
@@ -344,7 +344,7 @@ Reference implementation: https://github.com/moovfinancial/webhook-handler
 
 - Always verify signatures before processing events
 - Respond with 2xx quickly — process the event asynchronously if needed
-- Handle duplicate events idempotently (use `X-Webhook-ID` to deduplicate)
+- Handle duplicate events idempotently (use `eventID` to deduplicate). Do not use `X-Webhook-ID`; that header identifies the webhook subscription, not the event.
 - Subscribe only to the event types you need
 - Use a queue (SQS, Redis, etc.) for reliable processing if your handler is complex
 - Log webhook payloads for debugging
